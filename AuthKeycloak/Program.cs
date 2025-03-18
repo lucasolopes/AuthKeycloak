@@ -55,8 +55,6 @@ builder.Services.AddKeycloakWebApiAuthentication(builder.Configuration, o =>
     };
 });
 
-builder.Services.AddHttpClient<TokenService>();
-
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
