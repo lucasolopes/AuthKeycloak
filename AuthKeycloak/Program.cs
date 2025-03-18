@@ -1,7 +1,9 @@
 using System.Security.Claims;
+using AuthKeycloak.Authorization;
 using AuthKeycloak.Extensions;
 using Keycloak.AuthServices.Authentication;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.IdentityModel.Tokens;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -17,6 +19,9 @@ builder.Services.AddSwaggerGen();
 
 builder.Services.AddAuthorization(options =>
 {
+    options.AddPolicy("SomenteProprioUsuario", policy =>
+        policy.Requirements.Add(new MesmaIdentidadeRequirement()));
+
     // Política para usuários com role "api_user"
     options.AddPolicy("ApiUser", policy =>
         policy.RequireRole("api_user"));
@@ -43,6 +48,8 @@ builder.Services.AddAuthorization(options =>
             )
         ));
 });
+
+builder.Services.AddScoped<IAuthorizationHandler, MesmaIdentidadeHandler>();
 
 builder.Services.AddKeycloakWebApiAuthentication(builder.Configuration, o =>
 {
