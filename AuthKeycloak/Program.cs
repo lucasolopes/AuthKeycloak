@@ -15,8 +15,6 @@ builder.Services.AddSwaggerGenWithAuth(builder.Configuration);
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-builder.Services.AddKeycloakWebApiAuthentication(builder.Configuration);
-
 builder.Services.AddAuthorization(options =>
 {
     // Política para usuários com role "api_user"
@@ -46,17 +44,16 @@ builder.Services.AddAuthorization(options =>
         ));
 });
 
-builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-    .AddJwtBearer(o =>
+builder.Services.AddKeycloakWebApiAuthentication(builder.Configuration, o =>
+{
+    o.RequireHttpsMetadata = false;
+    o.Audience = builder.Configuration["Authentication:Audience"];
+    o.MetadataAddress = builder.Configuration["Authentication:MetadataAddress"]!;
+    o.TokenValidationParameters = new TokenValidationParameters
     {
-        o.RequireHttpsMetadata = false;
-        o.Audience = builder.Configuration["Authentication:Audience"];
-        o.MetadataAddress = builder.Configuration["Authentication:MetadataAddress"]!;
-        o.TokenValidationParameters = new TokenValidationParameters
-        {
-            ValidIssuer = builder.Configuration["Authentication:ValidIssuer"],
-        };
-    });
+        ValidIssuer = builder.Configuration["Authentication:ValidIssuer"],
+    };
+});
 
 builder.Services.AddHttpClient<TokenService>();
 
